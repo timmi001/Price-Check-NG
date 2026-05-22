@@ -1,15 +1,26 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: PriceCheck NG API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: products
+    description: Product operations
+  - name: vendors
+    description: Vendor operations
+  - name: prices
+    description: Price comparison operations
+  - name: categories
+    description: Category operations
+  - name: alerts
+    description: Price alert operations
+  - name: deals
+    description: Deals and trending operations
 paths:
   /healthz:
     get:
@@ -24,6 +35,331 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List all product categories
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  /products:
+    get:
+      operationId: listProducts
+      tags: [products]
+      summary: List products with optional search and category filter
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: category_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: location
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+    post:
+      operationId: createProduct
+      tags: [products]
+      summary: Create a new product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+
+  /products/trending:
+    get:
+      operationId: getTrendingProducts
+      tags: [products]
+      summary: Get trending products with their average prices
+      responses:
+        "200":
+          description: Trending products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrendingProduct"
+
+  /products/{id}:
+    get:
+      operationId: getProduct
+      tags: [products]
+      summary: Get product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Not found
+
+  /vendors:
+    get:
+      operationId: listVendors
+      tags: [vendors]
+      summary: List vendors with optional location filter
+      parameters:
+        - name: location
+          in: query
+          schema:
+            type: string
+        - name: verified
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of vendors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Vendor"
+    post:
+      operationId: createVendor
+      tags: [vendors]
+      summary: Register a new vendor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VendorInput"
+      responses:
+        "201":
+          description: Vendor created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vendor"
+
+  /vendors/{id}:
+    get:
+      operationId: getVendor
+      tags: [vendors]
+      summary: Get vendor by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Vendor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vendor"
+        "404":
+          description: Not found
+
+  /prices:
+    get:
+      operationId: listPrices
+      tags: [prices]
+      summary: Compare prices for a product across vendors
+      parameters:
+        - name: product_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: location
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum: [low_to_high, high_to_low, nearest, recently_updated]
+      responses:
+        "200":
+          description: Price comparison results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PriceEntry"
+    post:
+      operationId: submitPrice
+      tags: [prices]
+      summary: Submit a price for a product at a vendor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PriceInput"
+      responses:
+        "201":
+          description: Price submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceEntry"
+
+  /price-history:
+    get:
+      operationId: getPriceHistory
+      tags: [prices]
+      summary: Get 30-day price history for a product
+      parameters:
+        - name: product_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: location
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Price history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PriceHistoryPoint"
+
+  /price-summary:
+    get:
+      operationId: getPriceSummary
+      tags: [prices]
+      summary: Get price summary stats for a product (avg, min, max, trend)
+      parameters:
+        - name: product_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: location
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Price summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceSummary"
+
+  /deals:
+    get:
+      operationId: listDeals
+      tags: [deals]
+      summary: Get current best deals (cheapest vendors per category)
+      parameters:
+        - name: category_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: location
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Current deals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Deal"
+
+  /alerts:
+    get:
+      operationId: listAlerts
+      tags: [alerts]
+      summary: List price alerts for the user
+      responses:
+        "200":
+          description: List of price alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PriceAlert"
+    post:
+      operationId: createAlert
+      tags: [alerts]
+      summary: Create a price drop alert for a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PriceAlertInput"
+      responses:
+        "201":
+          description: Alert created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceAlert"
+
+  /alerts/{id}:
+    delete:
+      operationId: deleteAlert
+      tags: [alerts]
+      summary: Delete a price alert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Alert deleted
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +370,247 @@ components:
       required:
         - status
 
+    Category:
+      type: object
+      required: [id, name, icon, color]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        icon:
+          type: string
+        color:
+          type: string
+        product_count:
+          type: ["integer", "null"]
+
+    Product:
+      type: object
+      required: [id, name, category_id, unit]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category_id:
+          type: integer
+        category_name:
+          type: ["string", "null"]
+        unit:
+          type: string
+        description:
+          type: ["string", "null"]
+        image_url:
+          type: ["string", "null"]
+        average_price:
+          type: ["number", "null"]
+        min_price:
+          type: ["number", "null"]
+        vendor_count:
+          type: ["integer", "null"]
+
+    ProductInput:
+      type: object
+      required: [name, category_id, unit]
+      properties:
+        name:
+          type: string
+        category_id:
+          type: integer
+        unit:
+          type: string
+        description:
+          type: string
+        image_url:
+          type: string
+
+    TrendingProduct:
+      type: object
+      required: [id, name, unit, average_price, price_change_pct]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        category_name:
+          type: string
+        unit:
+          type: string
+        image_url:
+          type: ["string", "null"]
+        average_price:
+          type: number
+        min_price:
+          type: number
+        price_change_pct:
+          type: number
+        vendor_count:
+          type: integer
+
+    Vendor:
+      type: object
+      required: [id, name, location]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        location:
+          type: string
+        address:
+          type: ["string", "null"]
+        logo_url:
+          type: ["string", "null"]
+        verified:
+          type: boolean
+        whatsapp:
+          type: ["string", "null"]
+        price_count:
+          type: ["integer", "null"]
+
+    VendorInput:
+      type: object
+      required: [name, location]
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        address:
+          type: string
+        logo_url:
+          type: string
+        whatsapp:
+          type: string
+
+    PriceEntry:
+      type: object
+      required: [id, product_id, vendor_id, price, quantity, updated_at]
+      properties:
+        id:
+          type: integer
+        product_id:
+          type: integer
+        vendor_id:
+          type: integer
+        vendor_name:
+          type: string
+        vendor_location:
+          type: string
+        vendor_logo_url:
+          type: ["string", "null"]
+        vendor_verified:
+          type: boolean
+        vendor_whatsapp:
+          type: ["string", "null"]
+        price:
+          type: number
+        quantity:
+          type: string
+        is_cheapest:
+          type: boolean
+        updated_at:
+          type: string
+
+    PriceInput:
+      type: object
+      required: [product_id, vendor_id, price, quantity]
+      properties:
+        product_id:
+          type: integer
+        vendor_id:
+          type: integer
+        price:
+          type: number
+        quantity:
+          type: string
+
+    PriceHistoryPoint:
+      type: object
+      required: [date, average_price, min_price]
+      properties:
+        date:
+          type: string
+        average_price:
+          type: number
+        min_price:
+          type: number
+
+    PriceSummary:
+      type: object
+      required: [product_id, average_price, min_price, max_price, price_change_pct, vendor_count]
+      properties:
+        product_id:
+          type: integer
+        average_price:
+          type: number
+        min_price:
+          type: number
+        max_price:
+          type: number
+        price_change_pct:
+          type: number
+        vendor_count:
+          type: integer
+        cheapest_vendor:
+          type: ["string", "null"]
+
+    Deal:
+      type: object
+      required: [product_id, product_name, vendor_name, price, unit, original_avg_price]
+      properties:
+        product_id:
+          type: integer
+        product_name:
+          type: string
+        category_name:
+          type: string
+        vendor_name:
+          type: string
+        vendor_location:
+          type: string
+        vendor_verified:
+          type: boolean
+        price:
+          type: number
+        unit:
+          type: string
+        original_avg_price:
+          type: number
+        discount_pct:
+          type: number
+        image_url:
+          type: ["string", "null"]
+
+    PriceAlert:
+      type: object
+      required: [id, product_id, target_price, email, created_at]
+      properties:
+        id:
+          type: integer
+        product_id:
+          type: integer
+        product_name:
+          type: ["string", "null"]
+        target_price:
+          type: number
+        email:
+          type: string
+        location:
+          type: ["string", "null"]
+        created_at:
+          type: string
+
+    PriceAlertInput:
+      type: object
+      required: [product_id, target_price, email]
+      properties:
+        product_id:
+          type: integer
+        target_price:
+          type: number
+        email:
+          type: string
+        location:
+          type: string

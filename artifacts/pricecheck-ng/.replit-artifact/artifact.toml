@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "PriceCheck NG"
+version = "1.0.0"
+id = "artifacts/pricecheck-ng"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22571
+
+[services.development]
+run = "pnpm --filter @workspace/pricecheck-ng run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/pricecheck-ng", "run", "build" ]
+publicDir = "artifacts/pricecheck-ng/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22571"
+BASE_PATH = "/"

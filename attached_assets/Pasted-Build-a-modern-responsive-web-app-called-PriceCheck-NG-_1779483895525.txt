@@ -1,0 +1,167 @@
+Build a modern responsive web app called “PriceCheck NG” — a Nigerian local price comparison platform that helps users compare prices of groceries, fuel, electronics, food, beauty products, and household items across nearby stores and vendors.
+
+STYLE & DESIGN:
+- Clean modern UI similar to top fintech/startup landing pages
+- Soft white background with green accent colors (#16a34a style)
+- Rounded cards, subtle shadows, smooth hover effects
+- Mobile-first responsive design
+- Use modern typography like Inter or Poppins
+- Minimal but premium feel
+- Add smooth animations and transitions
+- Include realistic product/store images and icons
+
+LAYOUT STRUCTURE:
+
+1. TOP NAVBAR
+- Logo: “PriceCheck NG”
+- Navigation links:
+  - Home
+  - Categories
+  - Deals
+  - Price Trends
+  - Blog
+- Location selector dropdown (default: Lagos)
+- Dark/light mode toggle
+- User profile avatar
+
+2. HERO SECTION
+Large hero banner with:
+- Big heading:
+  “Find the best prices near you.”
+- Subtext:
+  “Compare prices across thousands of stores and vendors in Nigeria.”
+- Large search bar with:
+  - Search icon
+  - Placeholder: “1 bag of rice”
+  - Green search button
+- Popular search tags:
+  Rice, Gasoline, iPhone 14, Samsung A14, Indomie
+- Right side:
+  3D grocery basket illustration with rice, oil, noodles, etc.
+
+3. CATEGORY ICONS SECTION
+Horizontal categories with rounded cards:
+- Food Items
+- Beverages
+- Phones
+- Electronics
+- Gas
+- Beauty
+- View All
+
+Each category should have colorful modern icons.
+
+4. PRICE COMPARISON RESULTS
+Main content section with:
+- Section title:
+  “Price comparison results”
+- Subtitle:
+  “You searched for: 1 bag of rice in Lagos”
+- Filter button
+- Sort dropdown:
+  - Low to High
+  - High to Low
+  - Nearest
+  - Recently Updated
+
+Create vendor cards with:
+- Vendor logo
+- Vendor name
+- Location
+- Last updated time
+- Price in Naira
+- Product quantity info
+- “View Details” button
+- “Chat on WhatsApp” button
+- Highlight cheapest vendor with green badge
+
+Sample vendors:
+- SPAR Ikeja City Mall
+- Shoprite Surulere
+- Prince Ebeano Supermarket
+- Jumia Market
+- AP Plaza Market
+
+5. RIGHT SIDEBAR
+Include:
+A. Mini map card showing nearby stores
+B. Price trend graph
+- Average price
+- Percentage increase/decrease
+- 30-day chart
+C. Price alert card
+- Bell icon
+- “Get notified when prices drop”
+- “Set price alert” button
+D. Benefits card:
+- Save more money
+- Make smart choices
+- Support local vendors
+
+6. MORE PRODUCTS SECTION
+Horizontal product cards:
+- Rice
+- Cement
+- MTN Data
+- Petrol
+- Indomie
+Each card should show:
+- Product image
+- Current average price
+- “View Prices” button
+
+
+FEATURES TO IMPLEMENT:
+- Real-time search suggestions
+- Location-based results
+- Vendor dashboard system
+- WhatsApp integration
+- Live price updates
+- Price history charts
+- Save favorite products
+- Notifications for price drops
+- User accounts
+- Product comparison
+- AI-powered smart recommendations
+
+TECH STACK:
+Frontend:
+- Next.js
+- Tailwind CSS
+- Framer Motion
+- ShadCN UI
+
+Backend:
+- Node.js + Express OR Supabase
+- PostgreSQL database
+
+MAPS:
+- Google Maps API or Mapbox
+
+CHARTS:
+- Recharts or Chart.js
+
+AUTH:
+- supabase Auth
+
+ADDITIONAL DETAILS:
+- Make it feel like a real scalable Nigerian startup
+- Optimize for both desktop and mobile
+- Include loading skeletons
+- Add realistic Nigerian pricing data
+- Use modern card layouts
+- Add sticky search bar on scroll
+- Include SEO optimization
+- Add dark mode support
+- Add vendor verification badges
+- Include trending products section
+- Add smooth page animations
+
+Generate:
+- Full landing page UI
+- Responsive layouts
+- Reusable components
+- Modern dashboard-style sections
+- Production-ready frontend code
+- Clean component structure
+- Beautiful UX interactions
