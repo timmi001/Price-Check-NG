@@ -7,6 +7,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import VendorCard from "@/components/VendorCard";
+import BestDealCard from "@/components/BestDealCard";
+import OrderModal from "@/components/OrderModal";
+import VendorProfileModal from "@/components/VendorProfileModal";
 import PriceTrendChart from "@/components/PriceTrendChart";
 import {
   useGetProduct,
@@ -15,9 +18,11 @@ import {
   useGetPriceHistory,
   useGetPriceSummary,
   useCreateAlert,
+  useGetBestDeal,
 } from "@workspace/api-client-react";
 import { formatNaira } from "@/lib/format";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { BestDeal } from "@workspace/api-client-react";
 
 export default function ProductDetail() {
   const params = useParams<{ id: string }>();
@@ -28,6 +33,11 @@ export default function ProductDetail() {
   const [alertPrice, setAlertPrice] = useState("");
   const [alertSubmitted, setAlertSubmitted] = useState(false);
 
+  // Marketplace state
+  const [orderModalOpen, setOrderModalOpen] = useState(false);
+  const [orderOption, setOrderOption] = useState<BestDeal["options"][0] | null>(null);
+  const [vendorProfileId, setVendorProfileId] = useState<number | null>(null);
+
   const hasId = productId > 0;
 
   const { data: product, isLoading: productLoading } = useGetProduct(productId, {
@@ -35,7 +45,7 @@ export default function ProductDetail() {
   });
 
   const { data: prices, isLoading: pricesLoading } = useListPrices(
-    { product_id: productId, sort: sortOrder as "low_to_high" | "high_to_low" | "nearest" | "recently_updated" },
+    { product_id: productId, sort: sortOrder as "low_to_high" | "high_to_low" | "nearest" | "recently_updated" | "best_rated" },
     { query: { enabled: hasId } }
   );
 
@@ -45,6 +55,11 @@ export default function ProductDetail() {
   );
 
   const { data: summary } = useGetPriceSummary(
+    { product_id: productId },
+    { query: { enabled: hasId } }
+  );
+
+  const { data: bestDeal, isLoading: bestDealLoading } = useGetBestDeal(
     { product_id: productId },
     { query: { enabled: hasId } }
   );
@@ -61,6 +76,41 @@ export default function ProductDetail() {
     }
   };
 
+  const handleOrder = (option: BestDeal["options"][0]) => {
+    setOrderOption(option);
+    setOrderModalOpen(true);
+  };
+
+  const handleOrderFromCard = (entry: typeof prices extends Array<infer T> | undefined ? T : never) => {
+    if (!entry) return;
+    const opt: BestDeal["options"][0] = {
+      label: "Order",
+      badge: "",
+      vendor_id: entry.vendor_id,
+      vendor_name: entry.vendor_name,
+      vendor_location: entry.vendor_location,
+      vendor_logo_url: entry.vendor_logo_url ?? null,
+      vendor_verified: entry.vendor_verified ?? false,
+      vendor_whatsapp: entry.vendor_whatsapp ?? null,
+      vendor_rating: entry.vendor_rating ?? null,
+      vendor_stock_available: entry.vendor_stock_available ?? true,
+      price: Number(entry.price),
+      quantity: entry.quantity,
+    };
+    setOrderOption(opt);
+    setOrderModalOpen(true);
+  };
+
+  const categoryEmoji = (cat?: string | null) => {
+    if (cat === "Gas & Fuel") return "⛽";
+    if (cat === "Phones") return "📱";
+    if (cat === "Beverages") return "☕";
+    if (cat === "Electronics") return "💡";
+    if (cat === "Beauty") return "🧴";
+    if (cat === "Household") return "🏠";
+    return "🛒";
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -75,9 +125,7 @@ export default function ProductDetail() {
           ) : product ? (
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-4">
               <div className="w-16 h-16 bg-muted rounded-xl flex items-center justify-center text-3xl flex-shrink-0">
-                {product.category_name === "Gas & Fuel" ? "⛽" :
-                 product.category_name === "Phones" ? "📱" :
-                 product.category_name === "Beverages" ? "☕" : "🛒"}
+                {categoryEmoji(product.category_name)}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -116,6 +164,17 @@ export default function ProductDetail() {
           )}
         </div>
 
+        {/* Best Deal Engine */}
+        {bestDealLoading ? (
+          <Skeleton className="h-40 rounded-xl mb-6" />
+        ) : bestDeal && bestDeal.options.length > 0 ? (
+          <BestDealCard
+            deal={bestDeal}
+            productName={product?.name ?? ""}
+            onOrder={handleOrder}
+          />
+        ) : null}
+
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Price comparison */}
           <div className="lg:col-span-2">
@@ -125,21 +184,28 @@ export default function ProductDetail() {
                 {prices && <span className="text-muted-foreground font-normal text-sm ml-2">({prices.length} vendors)</span>}
               </h2>
               <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="w-40 h-8 text-xs" data-testid="sort-select">
+                <SelectTrigger className="w-44 h-8 text-xs" data-testid="sort-select">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="low_to_high">Low to High</SelectItem>
                   <SelectItem value="high_to_low">High to Low</SelectItem>
+                  <SelectItem value="best_rated">Best Rated</SelectItem>
                   <SelectItem value="recently_updated">Recently Updated</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex flex-col gap-3">
               {pricesLoading
-                ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-28 rounded-xl" />)
+                ? Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-36 rounded-xl" />)
                 : prices?.map((entry, i) => (
-                    <VendorCard key={entry.id} entry={entry} index={i} />
+                    <VendorCard
+                      key={entry.id}
+                      entry={entry}
+                      index={i}
+                      onOrder={() => handleOrderFromCard(entry)}
+                      onViewVendor={() => setVendorProfileId(entry.vendor_id)}
+                    />
                   ))}
               {!pricesLoading && prices?.length === 0 && (
                 <div className="text-center py-12 text-sm text-muted-foreground bg-card border border-border rounded-xl">
@@ -198,6 +264,19 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* Modals */}
+      <OrderModal
+        open={orderModalOpen}
+        onClose={() => { setOrderModalOpen(false); setOrderOption(null); }}
+        option={orderOption}
+        productId={productId}
+        productName={product?.name ?? ""}
+      />
+      <VendorProfileModal
+        vendorId={vendorProfileId}
+        onClose={() => setVendorProfileId(null)}
+      />
     </div>
   );
 }

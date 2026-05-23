@@ -10,9 +10,14 @@ export interface Deal {
   product_id: number;
   product_name: string;
   category_name?: string;
+  vendor_id?: number;
   vendor_name: string;
   vendor_location?: string;
   vendor_verified?: boolean;
+  /** @nullable */
+  vendor_whatsapp?: string | null;
+  /** @nullable */
+  vendor_rating?: number | null;
   price: number;
   unit: string;
   original_avg_price: number;

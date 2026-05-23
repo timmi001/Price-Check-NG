@@ -9,7 +9,6 @@ import * as zod from 'zod';
 
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -120,7 +119,12 @@ export const ListVendorsResponseItem = zod.object({
   "logo_url": zod.string().nullish(),
   "verified": zod.boolean().optional(),
   "whatsapp": zod.string().nullish(),
-  "price_count": zod.number().nullish()
+  "stock_available": zod.boolean().optional(),
+  "delivery_options": zod.string().nullish(),
+  "response_time": zod.string().nullish(),
+  "price_count": zod.number().nullish(),
+  "average_rating": zod.number().nullish(),
+  "rating_count": zod.number().nullish()
 })
 export const ListVendorsResponse = zod.array(ListVendorsResponseItem)
 
@@ -133,12 +137,14 @@ export const CreateVendorBody = zod.object({
   "location": zod.string(),
   "address": zod.string().optional(),
   "logo_url": zod.string().optional(),
-  "whatsapp": zod.string().optional()
+  "whatsapp": zod.string().optional(),
+  "delivery_options": zod.string().optional(),
+  "response_time": zod.string().optional()
 })
 
 
 /**
- * @summary Get vendor by ID
+ * @summary Get vendor by ID with ratings
  */
 export const GetVendorParams = zod.object({
   "id": zod.coerce.number()
@@ -152,8 +158,106 @@ export const GetVendorResponse = zod.object({
   "logo_url": zod.string().nullish(),
   "verified": zod.boolean().optional(),
   "whatsapp": zod.string().nullish(),
-  "price_count": zod.number().nullish()
+  "stock_available": zod.boolean().optional(),
+  "delivery_options": zod.string().nullish(),
+  "response_time": zod.string().nullish(),
+  "price_count": zod.number().nullish(),
+  "average_rating": zod.number().nullish(),
+  "rating_count": zod.number().nullish(),
+  "recent_reviews": zod.array(zod.object({
+  "id": zod.number(),
+  "vendor_id": zod.number(),
+  "rating": zod.number(),
+  "reviewer_name": zod.string(),
+  "comment": zod.string().nullish(),
+  "created_at": zod.string()
+})).optional()
 })
+
+
+/**
+ * @summary Update vendor profile
+ */
+export const UpdateVendorParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateVendorBody = zod.object({
+  "stock_available": zod.boolean().optional(),
+  "delivery_options": zod.string().optional(),
+  "response_time": zod.string().optional(),
+  "whatsapp": zod.string().optional(),
+  "address": zod.string().optional()
+})
+
+export const UpdateVendorResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "location": zod.string(),
+  "address": zod.string().nullish(),
+  "logo_url": zod.string().nullish(),
+  "verified": zod.boolean().optional(),
+  "whatsapp": zod.string().nullish(),
+  "stock_available": zod.boolean().optional(),
+  "delivery_options": zod.string().nullish(),
+  "response_time": zod.string().nullish(),
+  "price_count": zod.number().nullish(),
+  "average_rating": zod.number().nullish(),
+  "rating_count": zod.number().nullish()
+})
+
+
+/**
+ * @summary List reviews for a vendor
+ */
+export const ListVendorReviewsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ListVendorReviewsResponseItem = zod.object({
+  "id": zod.number(),
+  "vendor_id": zod.number(),
+  "rating": zod.number(),
+  "reviewer_name": zod.string(),
+  "comment": zod.string().nullish(),
+  "created_at": zod.string()
+})
+export const ListVendorReviewsResponse = zod.array(ListVendorReviewsResponseItem)
+
+
+/**
+ * @summary Submit a review for a vendor
+ */
+export const CreateVendorReviewParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CreateVendorReviewBody = zod.object({
+  "rating": zod.number(),
+  "reviewer_name": zod.string(),
+  "comment": zod.string().optional()
+})
+
+
+/**
+ * @summary Get all products and prices for a vendor (vendor dashboard)
+ */
+export const GetVendorProductsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetVendorProductsResponseItem = zod.object({
+  "price_id": zod.number(),
+  "product_id": zod.number(),
+  "product_name": zod.string(),
+  "category_name": zod.string().nullish(),
+  "unit": zod.string(),
+  "price": zod.number(),
+  "quantity": zod.string(),
+  "updated_at": zod.string(),
+  "stock_available": zod.boolean().optional()
+})
+export const GetVendorProductsResponse = zod.array(GetVendorProductsResponseItem)
 
 
 /**
@@ -162,7 +266,7 @@ export const GetVendorResponse = zod.object({
 export const ListPricesQueryParams = zod.object({
   "product_id": zod.coerce.number(),
   "location": zod.coerce.string().optional(),
-  "sort": zod.enum(['low_to_high', 'high_to_low', 'nearest', 'recently_updated']).optional()
+  "sort": zod.enum(['low_to_high', 'high_to_low', 'nearest', 'recently_updated', 'best_rated']).optional()
 })
 
 export const ListPricesResponseItem = zod.object({
@@ -174,9 +278,15 @@ export const ListPricesResponseItem = zod.object({
   "vendor_logo_url": zod.string().nullish(),
   "vendor_verified": zod.boolean().optional(),
   "vendor_whatsapp": zod.string().nullish(),
+  "vendor_rating": zod.number().nullish(),
+  "vendor_rating_count": zod.number().nullish(),
+  "vendor_stock_available": zod.boolean().optional(),
+  "vendor_delivery_options": zod.string().nullish(),
+  "vendor_response_time": zod.string().nullish(),
   "price": zod.number(),
   "quantity": zod.string(),
   "is_cheapest": zod.boolean().optional(),
+  "is_best_rated": zod.boolean().optional(),
   "updated_at": zod.string()
 })
 export const ListPricesResponse = zod.array(ListPricesResponseItem)
@@ -190,6 +300,41 @@ export const SubmitPriceBody = zod.object({
   "vendor_id": zod.number(),
   "price": zod.number(),
   "quantity": zod.string()
+})
+
+
+/**
+ * @summary Update a price listing (vendor dashboard)
+ */
+export const UpdatePriceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdatePriceBody = zod.object({
+  "price": zod.number().optional(),
+  "quantity": zod.string().optional(),
+  "stock_available": zod.boolean().optional()
+})
+
+export const UpdatePriceResponse = zod.object({
+  "id": zod.number(),
+  "product_id": zod.number(),
+  "vendor_id": zod.number(),
+  "vendor_name": zod.string().optional(),
+  "vendor_location": zod.string().optional(),
+  "vendor_logo_url": zod.string().nullish(),
+  "vendor_verified": zod.boolean().optional(),
+  "vendor_whatsapp": zod.string().nullish(),
+  "vendor_rating": zod.number().nullish(),
+  "vendor_rating_count": zod.number().nullish(),
+  "vendor_stock_available": zod.boolean().optional(),
+  "vendor_delivery_options": zod.string().nullish(),
+  "vendor_response_time": zod.string().nullish(),
+  "price": zod.number(),
+  "quantity": zod.string(),
+  "is_cheapest": zod.boolean().optional(),
+  "is_best_rated": zod.boolean().optional(),
+  "updated_at": zod.string()
 })
 
 
@@ -229,6 +374,33 @@ export const GetPriceSummaryResponse = zod.object({
 
 
 /**
+ * @summary Get best deal options for a product (cheapest, closest, best-rated)
+ */
+export const GetBestDealQueryParams = zod.object({
+  "product_id": zod.coerce.number(),
+  "location": zod.coerce.string().optional()
+})
+
+export const GetBestDealResponse = zod.object({
+  "product_id": zod.number(),
+  "options": zod.array(zod.object({
+  "label": zod.string(),
+  "vendor_id": zod.number(),
+  "vendor_name": zod.string(),
+  "vendor_location": zod.string(),
+  "vendor_logo_url": zod.string().nullish(),
+  "vendor_verified": zod.boolean().optional(),
+  "vendor_whatsapp": zod.string().nullable(),
+  "vendor_rating": zod.number().nullish(),
+  "vendor_stock_available": zod.boolean().optional(),
+  "price": zod.number(),
+  "quantity": zod.string(),
+  "badge": zod.string().optional()
+}))
+})
+
+
+/**
  * @summary Get current best deals (cheapest vendors per category)
  */
 export const ListDealsQueryParams = zod.object({
@@ -240,9 +412,12 @@ export const ListDealsResponseItem = zod.object({
   "product_id": zod.number(),
   "product_name": zod.string(),
   "category_name": zod.string().optional(),
+  "vendor_id": zod.number().optional(),
   "vendor_name": zod.string(),
   "vendor_location": zod.string().optional(),
   "vendor_verified": zod.boolean().optional(),
+  "vendor_whatsapp": zod.string().nullish(),
+  "vendor_rating": zod.number().nullish(),
   "price": zod.number(),
   "unit": zod.string(),
   "original_avg_price": zod.number(),
@@ -250,6 +425,98 @@ export const ListDealsResponseItem = zod.object({
   "image_url": zod.string().nullish()
 })
 export const ListDealsResponse = zod.array(ListDealsResponseItem)
+
+
+/**
+ * @summary List orders (optionally filter by vendor)
+ */
+export const ListOrdersQueryParams = zod.object({
+  "vendor_id": zod.coerce.number().nullish(),
+  "status": zod.coerce.string().optional()
+})
+
+export const ListOrdersResponseItem = zod.object({
+  "id": zod.number(),
+  "product_id": zod.number(),
+  "vendor_id": zod.number(),
+  "product_name": zod.string().nullish(),
+  "vendor_name": zod.string().nullish(),
+  "vendor_whatsapp": zod.string().nullish(),
+  "quantity": zod.number(),
+  "buyer_name": zod.string(),
+  "buyer_phone": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "status": zod.string(),
+  "price_at_order": zod.number().nullish(),
+  "created_at": zod.string()
+})
+export const ListOrdersResponse = zod.array(ListOrdersResponseItem)
+
+
+/**
+ * @summary Place an order
+ */
+export const CreateOrderBody = zod.object({
+  "product_id": zod.number(),
+  "vendor_id": zod.number(),
+  "quantity": zod.number(),
+  "buyer_name": zod.string(),
+  "buyer_phone": zod.string().optional(),
+  "notes": zod.string().optional(),
+  "price_at_order": zod.number().optional()
+})
+
+
+/**
+ * @summary Get order by ID
+ */
+export const GetOrderParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetOrderResponse = zod.object({
+  "id": zod.number(),
+  "product_id": zod.number(),
+  "vendor_id": zod.number(),
+  "product_name": zod.string().nullish(),
+  "vendor_name": zod.string().nullish(),
+  "vendor_whatsapp": zod.string().nullish(),
+  "quantity": zod.number(),
+  "buyer_name": zod.string(),
+  "buyer_phone": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "status": zod.string(),
+  "price_at_order": zod.number().nullish(),
+  "created_at": zod.string()
+})
+
+
+/**
+ * @summary Update order status (vendor confirms/rejects)
+ */
+export const UpdateOrderStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateOrderStatusBody = zod.object({
+  "status": zod.string()
+})
+
+export const UpdateOrderStatusResponse = zod.object({
+  "id": zod.number(),
+  "product_id": zod.number(),
+  "vendor_id": zod.number(),
+  "product_name": zod.string().nullish(),
+  "vendor_name": zod.string().nullish(),
+  "vendor_whatsapp": zod.string().nullish(),
+  "quantity": zod.number(),
+  "buyer_name": zod.string(),
+  "buyer_phone": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "status": zod.string(),
+  "price_at_order": zod.number().nullish(),
+  "created_at": zod.string()
+})
 
 
 /**

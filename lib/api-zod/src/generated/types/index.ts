@@ -6,24 +6,37 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './bestDeal';
+export * from './bestDealOption';
 export * from './category';
 export * from './deal';
+export * from './getBestDealParams';
 export * from './getPriceHistoryParams';
 export * from './getPriceSummaryParams';
 export * from './healthStatus';
 export * from './listDealsParams';
+export * from './listOrdersParams';
 export * from './listPricesParams';
 export * from './listPricesSort';
 export * from './listProductsParams';
 export * from './listVendorsParams';
+export * from './order';
+export * from './orderInput';
+export * from './orderStatusUpdate';
 export * from './priceAlert';
 export * from './priceAlertInput';
 export * from './priceEntry';
 export * from './priceHistoryPoint';
 export * from './priceInput';
 export * from './priceSummary';
+export * from './priceUpdateInput';
 export * from './product';
 export * from './productInput';
 export * from './trendingProduct';
 export * from './vendor';
+export * from './vendorDetail';
 export * from './vendorInput';
+export * from './vendorProductListing';
+export * from './vendorReview';
+export * from './vendorReviewInput';
+export * from './vendorUpdateInput';

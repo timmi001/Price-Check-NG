@@ -69,8 +69,52 @@ export interface Vendor {
   verified?: boolean;
   /** @nullable */
   whatsapp?: string | null;
+  stock_available?: boolean;
+  /** @nullable */
+  delivery_options?: string | null;
+  /** @nullable */
+  response_time?: string | null;
   /** @nullable */
   price_count?: number | null;
+  /** @nullable */
+  average_rating?: number | null;
+  /** @nullable */
+  rating_count?: number | null;
+}
+
+export interface VendorReview {
+  id: number;
+  vendor_id: number;
+  rating: number;
+  reviewer_name: string;
+  /** @nullable */
+  comment?: string | null;
+  created_at: string;
+}
+
+export interface VendorDetail {
+  id: number;
+  name: string;
+  location: string;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  logo_url?: string | null;
+  verified?: boolean;
+  /** @nullable */
+  whatsapp?: string | null;
+  stock_available?: boolean;
+  /** @nullable */
+  delivery_options?: string | null;
+  /** @nullable */
+  response_time?: string | null;
+  /** @nullable */
+  price_count?: number | null;
+  /** @nullable */
+  average_rating?: number | null;
+  /** @nullable */
+  rating_count?: number | null;
+  recent_reviews?: VendorReview[];
 }
 
 export interface VendorInput {
@@ -79,6 +123,35 @@ export interface VendorInput {
   address?: string;
   logo_url?: string;
   whatsapp?: string;
+  delivery_options?: string;
+  response_time?: string;
+}
+
+export interface VendorUpdateInput {
+  stock_available?: boolean;
+  delivery_options?: string;
+  response_time?: string;
+  whatsapp?: string;
+  address?: string;
+}
+
+export interface VendorProductListing {
+  price_id: number;
+  product_id: number;
+  product_name: string;
+  /** @nullable */
+  category_name?: string | null;
+  unit: string;
+  price: number;
+  quantity: string;
+  updated_at: string;
+  stock_available?: boolean;
+}
+
+export interface VendorReviewInput {
+  rating: number;
+  reviewer_name: string;
+  comment?: string;
 }
 
 export interface PriceEntry {
@@ -92,9 +165,19 @@ export interface PriceEntry {
   vendor_verified?: boolean;
   /** @nullable */
   vendor_whatsapp?: string | null;
+  /** @nullable */
+  vendor_rating?: number | null;
+  /** @nullable */
+  vendor_rating_count?: number | null;
+  vendor_stock_available?: boolean;
+  /** @nullable */
+  vendor_delivery_options?: string | null;
+  /** @nullable */
+  vendor_response_time?: string | null;
   price: number;
   quantity: string;
   is_cheapest?: boolean;
+  is_best_rated?: boolean;
   updated_at: string;
 }
 
@@ -103,6 +186,12 @@ export interface PriceInput {
   vendor_id: number;
   price: number;
   quantity: string;
+}
+
+export interface PriceUpdateInput {
+  price?: number;
+  quantity?: string;
+  stock_available?: boolean;
 }
 
 export interface PriceHistoryPoint {
@@ -122,19 +211,83 @@ export interface PriceSummary {
   cheapest_vendor?: string | null;
 }
 
+export interface BestDealOption {
+  label: string;
+  vendor_id: number;
+  vendor_name: string;
+  vendor_location: string;
+  /** @nullable */
+  vendor_logo_url?: string | null;
+  vendor_verified?: boolean;
+  /** @nullable */
+  vendor_whatsapp: string | null;
+  /** @nullable */
+  vendor_rating?: number | null;
+  vendor_stock_available?: boolean;
+  price: number;
+  quantity: string;
+  badge?: string;
+}
+
+export interface BestDeal {
+  product_id: number;
+  options: BestDealOption[];
+}
+
 export interface Deal {
   product_id: number;
   product_name: string;
   category_name?: string;
+  vendor_id?: number;
   vendor_name: string;
   vendor_location?: string;
   vendor_verified?: boolean;
+  /** @nullable */
+  vendor_whatsapp?: string | null;
+  /** @nullable */
+  vendor_rating?: number | null;
   price: number;
   unit: string;
   original_avg_price: number;
   discount_pct?: number;
   /** @nullable */
   image_url?: string | null;
+}
+
+export interface Order {
+  id: number;
+  product_id: number;
+  vendor_id: number;
+  /** @nullable */
+  product_name?: string | null;
+  /** @nullable */
+  vendor_name?: string | null;
+  /** @nullable */
+  vendor_whatsapp?: string | null;
+  quantity: number;
+  buyer_name: string;
+  /** @nullable */
+  buyer_phone?: string | null;
+  /** @nullable */
+  notes?: string | null;
+  status: string;
+  /** @nullable */
+  price_at_order?: number | null;
+  created_at: string;
+}
+
+export interface OrderInput {
+  product_id: number;
+  vendor_id: number;
+  quantity: number;
+  buyer_name: string;
+  buyer_phone?: string;
+  notes?: string;
+  price_at_order?: number;
+}
+
+export interface OrderStatusUpdate {
+  status: string;
 }
 
 export interface PriceAlert {
@@ -184,6 +337,7 @@ export const ListPricesSort = {
   high_to_low: 'high_to_low',
   nearest: 'nearest',
   recently_updated: 'recently_updated',
+  best_rated: 'best_rated',
 } as const;
 
 export type GetPriceHistoryParams = {
@@ -196,11 +350,24 @@ product_id: number;
 location?: string;
 };
 
+export type GetBestDealParams = {
+product_id: number;
+location?: string;
+};
+
 export type ListDealsParams = {
 /**
  * @nullable
  */
 category_id?: number | null;
 location?: string;
+};
+
+export type ListOrdersParams = {
+/**
+ * @nullable
+ */
+vendor_id?: number | null;
+status?: string;
 };
 

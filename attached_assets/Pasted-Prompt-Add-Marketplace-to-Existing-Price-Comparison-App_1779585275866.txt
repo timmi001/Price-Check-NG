@@ -1,0 +1,133 @@
+Prompt: Add Marketplace to Existing Price Comparison App
+
+You are working on an existing price comparison web/mobile app. The app currently shows users products and compares prices from different vendors.
+
+Now extend the system by adding a Marketplace Layer where users can not only compare prices but also directly interact with vendors and purchase from the best deal.
+
+🎯 Core Goal
+
+Transform the app from:
+
+“Price comparison tool”
+
+Into:
+
+“Price comparison + local marketplace platform”
+
+Where users can:
+
+Compare prices across vendors
+View the “Best Deal” automatically
+Contact or buy directly from vendors
+Place orders inside the app or via WhatsApp
+See vendor profiles and trust ratings
+🧩 New Features to Add
+1. Vendor Marketplace Listings
+
+Each vendor should have:
+
+Store name
+Location (optional GPS-based sorting)
+Product list with prices
+Stock availability
+Delivery options
+WhatsApp/contact button
+Rating and reviews
+2. “Best Deal” Engine
+
+For every product page:
+
+Automatically highlight the cheapest vendor
+Also show:
+Closest vendor
+Best rated vendor
+Fastest delivery option (if available)
+
+Display section:
+
+🏆 Best Deal Card (top of product page)
+
+Example:
+
+Vendor A — ₦5,500 (Cheapest)
+Vendor B — ₦5,700 (Closer)
+Vendor C — ₦6,000 (Best rated)
+3. Marketplace Purchase Flow
+
+Add a simple checkout flow:
+
+Option A: WhatsApp Order (MVP)
+
+User clicks “Order via WhatsApp”
+Pre-filled message is generated:
+Product name
+Quantity
+Price
+Vendor name
+Opens WhatsApp chat with vendor
+
+Option B: In-App Order (Optional phase 2)
+
+Add cart system
+Place order inside app
+Order status tracking (Pending → Confirmed → Delivered)
+4. Vendor Dashboard
+
+Create a simple vendor panel:
+
+Add/edit products
+Update prices in real-time
+Mark stock as available/unavailable
+View incoming orders
+Respond to customers
+5. Comparison + Marketplace Merge UI
+
+On each product page:
+
+Sections:
+
+🔍 Price Comparison Table
+List all vendors and prices
+🏆 Best Deal Highlight Card
+Cheapest + recommended option
+🛒 Buy Now Section
+“Order from this vendor”
+WhatsApp / Checkout button
+📍 Nearby Vendors Map/List
+Sort by distance
+6. Trust & Ranking System
+
+Rank vendors using:
+
+Price (lowest wins)
+Distance
+Rating
+Response speed
+Stock reliability
+7. Database Changes (if needed)
+
+Add tables/models:
+
+Vendors
+Products
+VendorProducts (price per vendor)
+Orders
+Reviews
+Locations (optional geo data)
+⚙️ System Behavior
+App should still function as a comparison tool first
+Marketplace features are an overlay upgrade
+“Best Deal” must always auto-update when prices change
+Vendors should be able to update prices in real-time
+💡 UX Requirement
+
+Keep UI simple:
+
+Comparison first
+Marketplace second
+One-click action to buy/contact vendor
+🚀 Final Outcome
+
+The app becomes:
+
+A real-time Nigerian price comparison + marketplace platform where users instantly find the cheapest vendor and can buy directly.

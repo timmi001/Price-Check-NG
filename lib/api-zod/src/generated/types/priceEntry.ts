@@ -17,8 +17,18 @@ export interface PriceEntry {
   vendor_verified?: boolean;
   /** @nullable */
   vendor_whatsapp?: string | null;
+  /** @nullable */
+  vendor_rating?: number | null;
+  /** @nullable */
+  vendor_rating_count?: number | null;
+  vendor_stock_available?: boolean;
+  /** @nullable */
+  vendor_delivery_options?: string | null;
+  /** @nullable */
+  vendor_response_time?: string | null;
   price: number;
   quantity: string;
   is_cheapest?: boolean;
+  is_best_rated?: boolean;
   updated_at: string;
 }

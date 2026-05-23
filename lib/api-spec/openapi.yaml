@@ -21,13 +21,16 @@ tags:
     description: Price alert operations
   - name: deals
     description: Deals and trending operations
+  - name: reviews
+    description: Vendor review operations
+  - name: orders
+    description: Order operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -177,7 +180,7 @@ paths:
     get:
       operationId: getVendor
       tags: [vendors]
-      summary: Get vendor by ID
+      summary: Get vendor by ID with ratings
       parameters:
         - name: id
           in: path
@@ -186,13 +189,101 @@ paths:
             type: integer
       responses:
         "200":
-          description: Vendor
+          description: Vendor with rating info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorDetail"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateVendor
+      tags: [vendors]
+      summary: Update vendor profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VendorUpdateInput"
+      responses:
+        "200":
+          description: Updated vendor
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Vendor"
-        "404":
-          description: Not found
+
+  /vendors/{id}/reviews:
+    get:
+      operationId: listVendorReviews
+      tags: [reviews]
+      summary: List reviews for a vendor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VendorReview"
+    post:
+      operationId: createVendorReview
+      tags: [reviews]
+      summary: Submit a review for a vendor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VendorReviewInput"
+      responses:
+        "201":
+          description: Review created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorReview"
+
+  /vendors/{id}/products:
+    get:
+      operationId: getVendorProducts
+      tags: [vendors]
+      summary: Get all products and prices for a vendor (vendor dashboard)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Vendor product listings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VendorProductListing"
 
   /prices:
     get:
@@ -213,7 +304,7 @@ paths:
           in: query
           schema:
             type: string
-            enum: [low_to_high, high_to_low, nearest, recently_updated]
+            enum: [low_to_high, high_to_low, nearest, recently_updated, best_rated]
       responses:
         "200":
           description: Price comparison results
@@ -236,6 +327,31 @@ paths:
       responses:
         "201":
           description: Price submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceEntry"
+
+  /prices/{id}:
+    patch:
+      operationId: updatePrice
+      tags: [prices]
+      summary: Update a price listing (vendor dashboard)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PriceUpdateInput"
+      responses:
+        "200":
+          description: Updated price entry
           content:
             application/json:
               schema:
@@ -289,6 +405,29 @@ paths:
               schema:
                 $ref: "#/components/schemas/PriceSummary"
 
+  /best-deal:
+    get:
+      operationId: getBestDeal
+      tags: [deals]
+      summary: Get best deal options for a product (cheapest, closest, best-rated)
+      parameters:
+        - name: product_id
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: location
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Best deal options
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BestDeal"
+
   /deals:
     get:
       operationId: listDeals
@@ -312,6 +451,89 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Deal"
+
+  /orders:
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List orders (optionally filter by vendor)
+      parameters:
+        - name: vendor_id
+          in: query
+          schema:
+            type: ["integer", "null"]
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Order"
+    post:
+      operationId: createOrder
+      tags: [orders]
+      summary: Place an order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderInput"
+      responses:
+        "201":
+          description: Order placed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+
+  /orders/{id}:
+    get:
+      operationId: getOrder
+      tags: [orders]
+      summary: Get order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
+    patch:
+      operationId: updateOrderStatus
+      tags: [orders]
+      summary: Update order status (vendor confirms/rejects)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrderStatusUpdate"
+      responses:
+        "200":
+          description: Updated order
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order"
 
   /alerts:
     get:
@@ -466,8 +688,53 @@ components:
           type: boolean
         whatsapp:
           type: ["string", "null"]
+        stock_available:
+          type: boolean
+        delivery_options:
+          type: ["string", "null"]
+        response_time:
+          type: ["string", "null"]
         price_count:
           type: ["integer", "null"]
+        average_rating:
+          type: ["number", "null"]
+        rating_count:
+          type: ["integer", "null"]
+
+    VendorDetail:
+      type: object
+      required: [id, name, location]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        location:
+          type: string
+        address:
+          type: ["string", "null"]
+        logo_url:
+          type: ["string", "null"]
+        verified:
+          type: boolean
+        whatsapp:
+          type: ["string", "null"]
+        stock_available:
+          type: boolean
+        delivery_options:
+          type: ["string", "null"]
+        response_time:
+          type: ["string", "null"]
+        price_count:
+          type: ["integer", "null"]
+        average_rating:
+          type: ["number", "null"]
+        rating_count:
+          type: ["integer", "null"]
+        recent_reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/VendorReview"
 
     VendorInput:
       type: object
@@ -482,6 +749,75 @@ components:
         logo_url:
           type: string
         whatsapp:
+          type: string
+        delivery_options:
+          type: string
+        response_time:
+          type: string
+
+    VendorUpdateInput:
+      type: object
+      properties:
+        stock_available:
+          type: boolean
+        delivery_options:
+          type: string
+        response_time:
+          type: string
+        whatsapp:
+          type: string
+        address:
+          type: string
+
+    VendorProductListing:
+      type: object
+      required: [price_id, product_id, product_name, unit, price, quantity, updated_at]
+      properties:
+        price_id:
+          type: integer
+        product_id:
+          type: integer
+        product_name:
+          type: string
+        category_name:
+          type: ["string", "null"]
+        unit:
+          type: string
+        price:
+          type: number
+        quantity:
+          type: string
+        updated_at:
+          type: string
+        stock_available:
+          type: boolean
+
+    VendorReview:
+      type: object
+      required: [id, vendor_id, rating, reviewer_name, created_at]
+      properties:
+        id:
+          type: integer
+        vendor_id:
+          type: integer
+        rating:
+          type: integer
+        reviewer_name:
+          type: string
+        comment:
+          type: ["string", "null"]
+        created_at:
+          type: string
+
+    VendorReviewInput:
+      type: object
+      required: [rating, reviewer_name]
+      properties:
+        rating:
+          type: integer
+        reviewer_name:
+          type: string
+        comment:
           type: string
 
     PriceEntry:
@@ -504,11 +840,23 @@ components:
           type: boolean
         vendor_whatsapp:
           type: ["string", "null"]
+        vendor_rating:
+          type: ["number", "null"]
+        vendor_rating_count:
+          type: ["integer", "null"]
+        vendor_stock_available:
+          type: boolean
+        vendor_delivery_options:
+          type: ["string", "null"]
+        vendor_response_time:
+          type: ["string", "null"]
         price:
           type: number
         quantity:
           type: string
         is_cheapest:
+          type: boolean
+        is_best_rated:
           type: boolean
         updated_at:
           type: string
@@ -525,6 +873,16 @@ components:
           type: number
         quantity:
           type: string
+
+    PriceUpdateInput:
+      type: object
+      properties:
+        price:
+          type: number
+        quantity:
+          type: string
+        stock_available:
+          type: boolean
 
     PriceHistoryPoint:
       type: object
@@ -556,6 +914,46 @@ components:
         cheapest_vendor:
           type: ["string", "null"]
 
+    BestDealOption:
+      type: object
+      required: [label, vendor_id, vendor_name, vendor_location, price, quantity, vendor_whatsapp]
+      properties:
+        label:
+          type: string
+        vendor_id:
+          type: integer
+        vendor_name:
+          type: string
+        vendor_location:
+          type: string
+        vendor_logo_url:
+          type: ["string", "null"]
+        vendor_verified:
+          type: boolean
+        vendor_whatsapp:
+          type: ["string", "null"]
+        vendor_rating:
+          type: ["number", "null"]
+        vendor_stock_available:
+          type: boolean
+        price:
+          type: number
+        quantity:
+          type: string
+        badge:
+          type: string
+
+    BestDeal:
+      type: object
+      required: [product_id, options]
+      properties:
+        product_id:
+          type: integer
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/BestDealOption"
+
     Deal:
       type: object
       required: [product_id, product_name, vendor_name, price, unit, original_avg_price]
@@ -566,12 +964,18 @@ components:
           type: string
         category_name:
           type: string
+        vendor_id:
+          type: integer
         vendor_name:
           type: string
         vendor_location:
           type: string
         vendor_verified:
           type: boolean
+        vendor_whatsapp:
+          type: ["string", "null"]
+        vendor_rating:
+          type: ["number", "null"]
         price:
           type: number
         unit:
@@ -582,6 +986,63 @@ components:
           type: number
         image_url:
           type: ["string", "null"]
+
+    Order:
+      type: object
+      required: [id, product_id, vendor_id, quantity, buyer_name, status, created_at]
+      properties:
+        id:
+          type: integer
+        product_id:
+          type: integer
+        vendor_id:
+          type: integer
+        product_name:
+          type: ["string", "null"]
+        vendor_name:
+          type: ["string", "null"]
+        vendor_whatsapp:
+          type: ["string", "null"]
+        quantity:
+          type: integer
+        buyer_name:
+          type: string
+        buyer_phone:
+          type: ["string", "null"]
+        notes:
+          type: ["string", "null"]
+        status:
+          type: string
+        price_at_order:
+          type: ["number", "null"]
+        created_at:
+          type: string
+
+    OrderInput:
+      type: object
+      required: [product_id, vendor_id, quantity, buyer_name]
+      properties:
+        product_id:
+          type: integer
+        vendor_id:
+          type: integer
+        quantity:
+          type: integer
+        buyer_name:
+          type: string
+        buyer_phone:
+          type: string
+        notes:
+          type: string
+        price_at_order:
+          type: number
+
+    OrderStatusUpdate:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
 
     PriceAlert:
       type: object

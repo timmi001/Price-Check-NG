@@ -14,4 +14,5 @@ export const ListPricesSort = {
   high_to_low: 'high_to_low',
   nearest: 'nearest',
   recently_updated: 'recently_updated',
+  best_rated: 'best_rated',
 } as const;

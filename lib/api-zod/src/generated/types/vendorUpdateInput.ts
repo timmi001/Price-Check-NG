@@ -6,12 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface VendorInput {
-  name: string;
-  location: string;
-  address?: string;
-  logo_url?: string;
-  whatsapp?: string;
+export interface VendorUpdateInput {
+  stock_available?: boolean;
   delivery_options?: string;
   response_time?: string;
+  whatsapp?: string;
+  address?: string;
 }

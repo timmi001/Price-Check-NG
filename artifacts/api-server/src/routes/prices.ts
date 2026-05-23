@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, pricesTable, vendorsTable, productsTable, priceHistoryTable } from "@workspace/db";
+import { db, pricesTable, vendorsTable, productsTable, priceHistoryTable, vendorReviewsTable } from "@workspace/db";
 import { sql, eq, asc } from "drizzle-orm";
 import {
   ListPricesQueryParams,
@@ -9,6 +9,9 @@ import {
   GetPriceHistoryResponse,
   GetPriceSummaryQueryParams,
   GetPriceSummaryResponse,
+  UpdatePriceParams,
+  UpdatePriceBody,
+  UpdatePriceResponse,
 } from "@workspace/api-zod";
 
 const router: IRouter = Router();
@@ -32,24 +35,32 @@ router.get("/prices", async (req, res): Promise<void> => {
       vendor_logo_url: vendorsTable.logoUrl,
       vendor_verified: vendorsTable.verified,
       vendor_whatsapp: vendorsTable.whatsapp,
+      vendor_stock_available: vendorsTable.stockAvailable,
+      vendor_delivery_options: vendorsTable.deliveryOptions,
+      vendor_response_time: vendorsTable.responseTime,
+      vendor_rating: sql<number>`round(avg(${vendorReviewsTable.rating})::numeric, 1)::float8`,
+      vendor_rating_count: sql<number>`count(${vendorReviewsTable.id})::int`,
       price: sql<number>`${pricesTable.price}::float8`,
       quantity: pricesTable.quantity,
       updated_at: pricesTable.updatedAt,
     })
     .from(pricesTable)
     .innerJoin(vendorsTable, eq(vendorsTable.id, pricesTable.vendorId))
+    .leftJoin(vendorReviewsTable, eq(vendorReviewsTable.vendorId, vendorsTable.id))
     .where(eq(pricesTable.productId, Number(product_id)))
+    .groupBy(pricesTable.id, vendorsTable.id)
     .orderBy(asc(pricesTable.price));
 
   const minPrice = allPrices.length > 0 ? Math.min(...allPrices.map((p) => Number(p.price))) : null;
+  const maxRating = allPrices.length > 0 ? Math.max(...allPrices.map((p) => Number(p.vendor_rating ?? 0))) : null;
 
-  let sorted = allPrices;
+  let sorted = [...allPrices];
   if (sort === "high_to_low") {
-    sorted = [...allPrices].sort((a, b) => Number(b.price) - Number(a.price));
+    sorted.sort((a, b) => Number(b.price) - Number(a.price));
+  } else if (sort === "best_rated") {
+    sorted.sort((a, b) => Number(b.vendor_rating ?? 0) - Number(a.vendor_rating ?? 0));
   } else if (sort === "recently_updated") {
-    sorted = [...allPrices].sort(
-      (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
-    );
+    sorted.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
   }
 
   const result = sorted.map((p) => ({
@@ -57,7 +68,13 @@ router.get("/prices", async (req, res): Promise<void> => {
     vendor_logo_url: p.vendor_logo_url ?? null,
     vendor_whatsapp: p.vendor_whatsapp ?? null,
     vendor_verified: p.vendor_verified ?? false,
+    vendor_stock_available: p.vendor_stock_available ?? true,
+    vendor_delivery_options: p.vendor_delivery_options ?? null,
+    vendor_response_time: p.vendor_response_time ?? null,
+    vendor_rating: p.vendor_rating ?? null,
+    vendor_rating_count: p.vendor_rating_count ?? 0,
     is_cheapest: minPrice !== null && Number(p.price) === minPrice,
+    is_best_rated: maxRating !== null && maxRating > 0 && Number(p.vendor_rating ?? 0) === maxRating,
     updated_at: new Date(p.updated_at).toISOString(),
   }));
 
@@ -92,11 +109,73 @@ router.post("/prices", async (req, res): Promise<void> => {
     vendor_logo_url: vendor?.logoUrl ?? null,
     vendor_verified: vendor?.verified ?? false,
     vendor_whatsapp: vendor?.whatsapp ?? null,
+    vendor_stock_available: vendor?.stockAvailable ?? true,
+    vendor_delivery_options: vendor?.deliveryOptions ?? null,
+    vendor_response_time: vendor?.responseTime ?? null,
+    vendor_rating: null,
+    vendor_rating_count: 0,
     price: Number(price.price),
     quantity: price.quantity,
     is_cheapest: false,
+    is_best_rated: false,
     updated_at: price.updatedAt.toISOString(),
   });
+});
+
+router.patch("/prices/:id", async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const params = UpdatePriceParams.safeParse({ id: parseInt(raw, 10) });
+  if (!params.success) {
+    res.status(400).json({ error: params.error.message });
+    return;
+  }
+
+  const body = UpdatePriceBody.safeParse(req.body);
+  if (!body.success) {
+    res.status(400).json({ error: body.error.message });
+    return;
+  }
+
+  const updateData: Record<string, unknown> = {};
+  if (body.data.price !== undefined) updateData.price = String(body.data.price);
+  if (body.data.quantity !== undefined) updateData.quantity = body.data.quantity;
+  updateData.updatedAt = new Date();
+
+  const [updated] = await db
+    .update(pricesTable)
+    .set(updateData)
+    .where(eq(pricesTable.id, params.data.id))
+    .returning();
+
+  if (!updated) {
+    res.status(404).json({ error: "Price not found" });
+    return;
+  }
+
+  const [vendor] = await db.select().from(vendorsTable).where(eq(vendorsTable.id, updated.vendorId));
+
+  res.json(
+    UpdatePriceResponse.parse({
+      id: updated.id,
+      product_id: updated.productId,
+      vendor_id: updated.vendorId,
+      vendor_name: vendor?.name ?? "",
+      vendor_location: vendor?.location ?? "",
+      vendor_logo_url: vendor?.logoUrl ?? null,
+      vendor_verified: vendor?.verified ?? false,
+      vendor_whatsapp: vendor?.whatsapp ?? null,
+      vendor_stock_available: vendor?.stockAvailable ?? true,
+      vendor_delivery_options: vendor?.deliveryOptions ?? null,
+      vendor_response_time: vendor?.responseTime ?? null,
+      vendor_rating: null,
+      vendor_rating_count: 0,
+      price: Number(updated.price),
+      quantity: updated.quantity,
+      is_cheapest: false,
+      is_best_rated: false,
+      updated_at: new Date(updated.updatedAt).toISOString(),
+    })
+  );
 });
 
 router.get("/price-history", async (req, res): Promise<void> => {

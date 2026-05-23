@@ -5,8 +5,9 @@
  * PriceCheck NG API specification
  * OpenAPI spec version: 0.1.0
  */
+import type { VendorReview } from './vendorReview';
 
-export interface Vendor {
+export interface VendorDetail {
   id: number;
   name: string;
   location: string;
@@ -28,4 +29,5 @@ export interface Vendor {
   average_rating?: number | null;
   /** @nullable */
   rating_count?: number | null;
+  recent_reviews?: VendorReview[];
 }
