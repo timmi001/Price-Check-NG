@@ -1,0 +1,292 @@
+Here’s a **high-quality build prompt** you can paste into **Cursor, Replit AI, Bolt, or any code generator** to recreate the exact app shown in your UI image.
+
+I made it detailed enough to generate a **real production-ready frontend + backend structure**.
+
+---
+
+# 🚀 FULL APP BUILD PROMPT (COPY & USE)
+
+## 🧠 Prompt:
+
+> Build a mobile-first full-stack marketplace + comparison app called **“PriceCompare”**.
+> The app allows users to compare product prices from multiple vendors and choose the best option based on cheapest price, trust score, delivery speed, and proximity.
+>
+> The app must be inspired by a modern fintech + marketplace UI (clean, minimal, purple accent theme).
+
+---
+
+# 📱 1. TECH STACK
+
+Use:
+
+* Frontend: React Native (Expo) OR Next.js (mobile-first PWA)
+* Backend: Node.js + Express
+* Database: PostgreSQL or MongoDB
+* Auth: Phone number OTP authentication only (no email/password)
+* Styling: TailwindCSS or NativeWind
+* State: Zustand or Redux Toolkit
+
+---
+
+# 🔐 2. AUTH SYSTEM (CRITICAL)
+
+* Users sign up ONLY using phone number (+234 format support)
+* OTP verification required
+* No email login
+* No password system
+* Store session token (JWT)
+
+User schema:
+
+```
+User {
+  id
+  name
+  phone
+  location
+  role: "user" | "independent_seller" | "vendor"
+  preferences: {
+   best value: boolean
+   budget friendly: boolean,
+    trusted: boolean,
+    nearby: boolean,
+    fastDelivery: boolean
+  }
+}
+```
+
+---
+
+# 🎨 3. UI DESIGN SYSTEM
+
+Style:
+
+* 
+* Background: White / soft gray
+* Cards: rounded 16px
+* Shadows: soft elevation
+* Buttons: full width rounded
+* Icons: minimal line icons
+
+---
+
+# 📲 4. SCREENS TO BUILD
+
+---
+
+## 🟣 A. WELCOME SCREEN
+
+* Logo top center
+* Headline:
+  “Compare. Choose. Buy smarter.”
+* Subtext:
+  “Find the best prices from trusted sellers near you.”
+* CTA button:
+  “Continue with Phone Number”
+
+---
+
+## 📞 B. PHONE AUTH SCREEN
+
+* Input phone number (+234 default)
+* Button: “Send OTP”
+* Clean centered layout
+
+---
+
+## 🔐 C. OTP SCREEN
+
+* 6-digit input boxes
+* Timer for resend OTP
+* Button: “Verify”
+
+---
+
+## 👤 D. PROFILE SETUP SCREEN
+
+* Name input (optional)
+* Location auto-detect + manual select
+* Profile image upload (optional)
+* Button: Continue
+
+---
+
+## 🎯 E. PREFERENCES SCREEN
+
+Checkbox UI:
+
+* budget friendly first
+* Best value
+* Trusted sellers only
+* Near me
+* Fast delivery
+
+Button: “Enter App”
+
+---
+
+## 🏠 F. HOME SCREEN (MAIN FEATURE)
+
+Build a **comparison-driven marketplace feed**:
+
+* Search bar at top: “Search product, brand, service…”
+* Category shortcuts:
+  Phones / Fashion / Food / Cars
+
+### Product cards must show:
+
+* Product image
+* Price
+* Vendor name
+* Trust score ⭐
+* Tags:
+
+  * budget friendly
+  * Best Value
+  * Near You
+  * Fast Delivery
+* WhatsApp button (very important)
+* Compare button
+
+---
+
+## 🔍 G. SEARCH RESULTS (COMPARISON ENGINE)
+
+When user searches:
+Show ranked results:
+
+* 🥇 budget friendly option
+* 🥈 Best value option
+* 🥉 Fast delivery option
+
+Each result card includes:
+
+* Price
+* Vendor
+* Rating
+* Location
+* CTA: WhatsApp chat
+* view details 
+
+
+
+---
+
+## 👤 I. USER PROFILE SCREEN
+
+Show:
+
+* Profile info
+* Preferences
+* Orders
+* Saved items
+* Saved vendors
+* Activity history
+
+Include button:
+“Become a Seller”
+
+---
+
+## 🏪 J. SELLER UPGRADE SCREEN
+
+Two options:
+
+* Independent Seller
+* Vendor
+
+Independent Seller:
+
+* personal selling
+* simple listing
+
+Vendor:
+
+* business profile
+* verified store
+
+---
+
+## 🧾 K. SELLER DASHBOARD
+
+Include:
+
+* Listings
+* Views
+* Chats (WhatsApp funnel)
+* Orders
+* Add product button
+
+Each product:
+
+* edit / delete
+* price update
+
+---
+
+# 🧠 5. CORE LOGIC (IMPORTANT)
+
+Ranking system must sort products based on:
+
+1. Cheapest price
+2. Trust score
+3. Delivery speed
+4. Distance
+5. Vendor verification status
+
+---
+
+# 📡 6. WHATSAPP INTEGRATION
+
+Every product must include:
+
+* “Chat on WhatsApp” button
+* Pre-filled message:
+  “Hi, I’m interested in [product name] from PriceCompare”
+
+---
+
+# 🧱 7. DATABASE STRUCTURE
+
+Tables:
+
+* Users
+* Products
+* Vendors
+* Orders
+* Chats (WhatsApp logs optional)
+
+---
+
+# ⚡ 8. PERFORMANCE REQUIREMENTS
+
+* Fast loading mobile UI
+* Lazy loading product lists
+* Cached search results
+* Optimized images
+
+---
+
+# 🎯 FINAL OUTPUT
+
+Build a fully functional app that:
+
+* Onboards users with phone OTP
+* Lets users compare prices intelligently
+* Connects buyers to sellers via WhatsApp
+* Allows users to become sellers later
+* Ranks listings based on smart decision engine
+
+---
+
+Design a mobile marketplace + comparison app UI using this color system:
+
+Primary Purple: #6C4DFF (Best Value, main actions, AI decisions)
+Trust Green: #1DBF73 (Trusted sellers, verification, safety)
+Budget Gold: #F4B400 (Affordable / lowest price labels)
+Info Blue: #3B82F6 (Fast delivery, location, info)
+Background: #F8F9FC
+Text: #1E1E1E
+Neutral Grey: #9CA3AF
+
+Use Purple for intelligence and ranking engine, Green for trust badges, Gold for budget deals, Blue for speed/location, and Grey for standard options. Keep UI clean, modern, and mobile-first for a Nigerian marketplace comparison app.
