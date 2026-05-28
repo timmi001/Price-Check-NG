@@ -33,8 +33,8 @@ export default function Deals() {
         {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-              <Tag className="w-4 h-4 text-primary" />
+            <div className="w-8 h-8 bg-[#F4B400]/10 rounded-lg flex items-center justify-center">
+              <Tag className="w-4 h-4 text-[#F4B400]" />
             </div>
             <h1 className="text-2xl font-bold text-foreground">Best Deals Today</h1>
           </div>
@@ -47,7 +47,9 @@ export default function Deals() {
             data-testid="filter-all"
             onClick={() => setSelectedCat(null)}
             className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-              selectedCat === null ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-foreground hover:border-primary"
+              selectedCat === null
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card border-border text-foreground hover:border-primary"
             }`}
           >
             All Categories
@@ -58,7 +60,9 @@ export default function Deals() {
               data-testid={`filter-cat-${cat.id}`}
               onClick={() => setSelectedCat(cat.id)}
               className={`flex-shrink-0 px-4 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                selectedCat === cat.id ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border text-foreground hover:border-primary"
+                selectedCat === cat.id
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card border-border text-foreground hover:border-primary"
               }`}
             >
               {cat.name}
@@ -72,7 +76,7 @@ export default function Deals() {
             ? Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-64 rounded-xl" />)
             : deals?.map((deal, i) => {
                 const waUrl = deal.vendor_whatsapp
-                  ? `https://wa.me/${deal.vendor_whatsapp}?text=${encodeURIComponent(`Hi ${deal.vendor_name}, I found you on PriceCheck NG. I'm interested in ${deal.product_name} at ${formatNaira(deal.price)}. Is it still available?`)}`
+                  ? `https://wa.me/${deal.vendor_whatsapp}?text=${encodeURIComponent(`Hi ${deal.vendor_name}, I found you on PriceCheck NG. I'm interested in ${deal.product_name} at ${formatNaira(deal.price)}. Is it available?`)}`
                   : null;
 
                 return (
@@ -84,20 +88,16 @@ export default function Deals() {
                     data-testid={`deal-card-${deal.product_id}`}
                     className="bg-card border border-border rounded-xl p-4 hover:shadow-md hover:border-primary/30 transition-all duration-200 flex flex-col"
                   >
-                    {/* Card header */}
                     <div className="flex items-start justify-between mb-3">
-                      <div className="text-3xl">
-                        {CATEGORY_EMOJI[deal.category_name] ?? "🛒"}
-                      </div>
+                      <div className="text-3xl">{CATEGORY_EMOJI[deal.category_name] ?? "🛒"}</div>
                       {deal.discount_pct > 0 && (
-                        <Badge className="bg-primary/10 text-primary border-0 text-xs font-semibold">
+                        <Badge className="bg-[#F4B400]/15 text-[#c49000] border-0 text-xs font-bold">
                           <TrendingDown className="w-3 h-3 mr-0.5" />
                           -{deal.discount_pct.toFixed(0)}%
                         </Badge>
                       )}
                     </div>
 
-                    {/* Product info */}
                     <h3
                       className="font-semibold text-sm text-foreground mb-0.5 line-clamp-2 cursor-pointer hover:text-primary transition-colors"
                       onClick={() => setLocation(`/product/${deal.product_id}`)}
@@ -107,15 +107,13 @@ export default function Deals() {
                     </h3>
                     <p className="text-xs text-muted-foreground mb-2">{deal.unit}</p>
 
-                    {/* Vendor info */}
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1 flex-wrap">
+                    <div className="flex items-center gap-1 text-xs mb-1 flex-wrap">
                       <span className="font-medium text-foreground">{deal.vendor_name}</span>
-                      {deal.vendor_verified && <ShieldCheck className="w-3 h-3 text-primary" />}
-                      <span>·</span>
-                      <span>{deal.vendor_location}</span>
+                      {deal.vendor_verified && <ShieldCheck className="w-3 h-3 text-[#1DBF73]" />}
+                      <span className="text-muted-foreground">·</span>
+                      <span className="text-[#3B82F6]">{deal.vendor_location}</span>
                     </div>
 
-                    {/* Rating */}
                     {deal.vendor_rating != null && deal.vendor_rating > 0 && (
                       <div className="flex items-center gap-1 mb-2">
                         <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
@@ -123,27 +121,18 @@ export default function Deals() {
                       </div>
                     )}
 
-                    {/* Price + actions */}
                     <div className="flex items-end justify-between mt-auto pt-2">
                       <div>
-                        <p className="text-xl font-bold text-primary" data-testid={`deal-price-${deal.product_id}`}>
+                        <p className="text-xl font-bold text-[#F4B400]" data-testid={`deal-price-${deal.product_id}`}>
                           {formatNaira(deal.price)}
                         </p>
                         {deal.original_avg_price > deal.price && (
-                          <p className="text-xs text-muted-foreground line-through">
-                            avg {formatNaira(deal.original_avg_price)}
-                          </p>
+                          <p className="text-xs text-muted-foreground line-through">avg {formatNaira(deal.original_avg_price)}</p>
                         )}
                       </div>
                       <div className="flex gap-1.5">
                         {waUrl && (
-                          <a
-                            href={waUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            data-testid={`deal-whatsapp-${deal.product_id}`}
-                          >
+                          <a href={waUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} data-testid={`deal-whatsapp-${deal.product_id}`}>
                             <Button size="sm" className="text-xs h-7 gap-1 bg-[#25D366] hover:bg-[#22c55e] text-white border-0 px-2">
                               <MessageCircle className="w-3 h-3" />
                             </Button>

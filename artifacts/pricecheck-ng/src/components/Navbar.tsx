@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Search, Bell, Sun, Moon, ChevronDown, MapPin, Menu, X } from "lucide-react";
+import { Search, Bell, Sun, Moon, ChevronDown, MapPin, Menu, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import {
@@ -20,7 +20,7 @@ const NAV_LINKS = [
 ];
 
 export default function Navbar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const { theme, setTheme } = useTheme();
   const [selectedCity, setSelectedCity] = useState("Lagos");
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -32,7 +32,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/">
             <span className="flex items-center gap-2 cursor-pointer" data-testid="logo">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shadow-sm">
                 <Search className="w-4 h-4 text-primary-foreground" />
               </div>
               <span className="font-bold text-lg text-foreground">
@@ -59,13 +59,13 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* Right side controls */}
+          {/* Right side */}
           <div className="flex items-center gap-2">
             {/* Location selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-1 text-sm" data-testid="location-selector">
-                  <MapPin className="w-3.5 h-3.5 text-primary" />
+                <Button variant="outline" size="sm" className="hidden sm:flex items-center gap-1 text-sm border-border" data-testid="location-selector">
+                  <MapPin className="w-3.5 h-3.5 text-[#3B82F6]" />
                   {selectedCity}
                   <ChevronDown className="w-3 h-3" />
                 </Button>
@@ -100,10 +100,12 @@ export default function Navbar() {
               <Bell className="w-4 h-4" />
             </Button>
 
-            {/* Avatar */}
-            <Avatar className="w-8 h-8 cursor-pointer" data-testid="user-avatar">
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">NG</AvatarFallback>
-            </Avatar>
+            {/* Profile avatar */}
+            <button onClick={() => setLocation("/profile")} data-testid="user-avatar">
+              <Avatar className="w-8 h-8 cursor-pointer ring-2 ring-primary/20 hover:ring-primary/40 transition-all">
+                <AvatarFallback className="bg-primary text-primary-foreground text-xs font-bold">EO</AvatarFallback>
+              </Avatar>
+            </button>
 
             {/* Mobile menu toggle */}
             <Button
@@ -134,8 +136,18 @@ export default function Navbar() {
                   </span>
                 </Link>
               ))}
+              <Link href="/profile">
+                <span
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer ${
+                    location === "/profile" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <User className="w-3.5 h-3.5" /> Profile
+                </span>
+              </Link>
               <div className="flex items-center gap-2 px-4 pt-2">
-                <MapPin className="w-4 h-4 text-primary" />
+                <MapPin className="w-4 h-4 text-[#3B82F6]" />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="text-sm gap-1">

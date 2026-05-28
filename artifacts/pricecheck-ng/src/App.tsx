@@ -9,6 +9,9 @@ import SearchPage from "@/pages/Search";
 import ProductDetail from "@/pages/ProductDetail";
 import Deals from "@/pages/Deals";
 import Categories from "@/pages/Categories";
+import UserProfile from "@/pages/UserProfile";
+import SellerUpgrade from "@/pages/SellerUpgrade";
+import SellerDashboard from "@/pages/SellerDashboard";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -31,6 +34,9 @@ function Router() {
           <Route path="/product/:id" component={ProductDetail} />
           <Route path="/deals" component={Deals} />
           <Route path="/categories" component={Categories} />
+          <Route path="/profile" component={UserProfile} />
+          <Route path="/seller-upgrade" component={SellerUpgrade} />
+          <Route path="/seller-dashboard" component={SellerDashboard} />
           <Route component={NotFound} />
         </Switch>
       </main>
