@@ -17,7 +17,6 @@ const NAV_LINKS = [
   { href: "/categories", label: "Categories" },
   { href: "/deals", label: "Deals" },
   { href: "/search", label: "Price Trends" },
-  { href: "/vendor-dashboard", label: "Vendors" },
 ];
 
 export default function Navbar() {
