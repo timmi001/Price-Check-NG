@@ -54,7 +54,7 @@ export default function UserProfile() {
           animate={{ opacity: 1, y: 0 }}
           className="relative rounded-2xl overflow-hidden mb-6"
         >
-          <div className="h-24 bg-gradient-to-r from-primary to-purple-400" />
+          <div className="h-24 bg-gradient-to-r from-primary to-emerald-400" />
           <div className="bg-card border border-border px-5 pb-5">
             <div className="flex items-end justify-between -mt-10 mb-3">
               <div className="w-20 h-20 rounded-2xl bg-primary/20 border-4 border-card flex items-center justify-center">
@@ -210,7 +210,7 @@ export default function UserProfile() {
           transition={{ delay: 0.2 }}
           className="mt-6 rounded-2xl overflow-hidden"
         >
-          <div className="bg-gradient-to-r from-primary to-purple-400 p-5 text-white">
+          <div className="bg-gradient-to-r from-primary to-emerald-400 p-5 text-white">
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
                 <Store className="w-5 h-5" />

@@ -1,10 +1,15 @@
-import { Switch, Route, Router as WouterRouter, Redirect } from "wouter";
+import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/Navbar";
+import Home from "@/pages/Home";
+import Search from "@/pages/Search";
+import Compare from "@/pages/Compare";
+import Saved from "@/pages/Saved";
 import UserProfile from "@/pages/UserProfile";
+import Chat from "@/pages/Chat";
 import SellerUpgrade from "@/pages/SellerUpgrade";
 import SellerDashboard from "@/pages/SellerDashboard";
 import NotFound from "@/pages/not-found";
@@ -22,12 +27,14 @@ function Router() {
   return (
     <>
       <Navbar />
-      <main>
+      <main className="pb-[calc(4.75rem+env(safe-area-inset-bottom))]">
         <Switch>
-          <Route path="/">
-            <Redirect to="/profile" />
-          </Route>
+          <Route path="/" component={Home} />
+          <Route path="/search" component={Search} />
+          <Route path="/compare" component={Compare} />
+          <Route path="/saved" component={Saved} />
           <Route path="/profile" component={UserProfile} />
+          <Route path="/chat" component={Chat} />
           <Route path="/seller-upgrade" component={SellerUpgrade} />
           <Route path="/seller-dashboard" component={SellerDashboard} />
           <Route component={NotFound} />

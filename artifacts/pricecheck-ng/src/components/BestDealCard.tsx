@@ -18,9 +18,9 @@ const OPTIONS_CONFIG = [
     icon: <Trophy className="w-4 h-4 text-[#F4B400]" />,
   },
   {
-    borderClass: "border-[#6C4DFF]/30 bg-[#6C4DFF]/5",
-    badgeClass: "bg-[#6C4DFF] text-white",
-    icon: <Star className="w-4 h-4 text-[#6C4DFF]" />,
+    borderClass: "border-primary/30 bg-primary/5",
+    badgeClass: "bg-primary text-primary-foreground",
+    icon: <Star className="w-4 h-4 text-primary" />,
   },
   {
     borderClass: "border-[#3B82F6]/30 bg-[#3B82F6]/5",

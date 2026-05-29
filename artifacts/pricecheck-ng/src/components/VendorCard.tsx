@@ -54,7 +54,7 @@ export default function VendorCard({ entry, index, onOrder, onViewVendor }: Vend
         entry.is_cheapest
           ? "border-[#F4B400]/40 ring-1 ring-[#F4B400]/20"
           : isBestRated
-          ? "border-[#6C4DFF]/30 ring-1 ring-[#6C4DFF]/15"
+          ? "border-primary/30 ring-1 ring-primary/15"
           : "border-border"
       }`}
     >
@@ -66,7 +66,7 @@ export default function VendorCard({ entry, index, onOrder, onViewVendor }: Vend
           </span>
         )}
         {isBestRated && !entry.is_cheapest && (
-          <span className="bg-[#6C4DFF] text-white text-xs font-bold px-2.5 py-0.5 rounded-full" data-testid={`badge-best-rated-${entry.id}`}>
+          <span className="bg-primary text-primary-foreground text-xs font-bold px-2.5 py-0.5 rounded-full" data-testid={`badge-best-rated-${entry.id}`}>
             ⭐ Top Rated
           </span>
         )}
